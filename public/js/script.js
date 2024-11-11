@@ -1,5 +1,6 @@
 const socket = io()
-//console.log('hhhh',socket)
+
+//Get location, if location not get than show error, refresh location in 5 sec
 if(navigator.geolocation){
     navigator.geolocation.watchPosition(
         (position)=>{
@@ -17,14 +18,17 @@ if(navigator.geolocation){
     )
 }
 
+//Set latitude and longitude default 0,0 and zooming 10
 const map = L.map("map").setView([0,0],10)
 
+//Attribution default OpenStreetMap (And add your location name)
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: 'OpenStreetMap'
 }).addTo(map);
 
 const markers = {}
 
+//Set latitude and longitude on map
 socket.on("receive-location",(data)=>{
     const {id,latitude,longitude} = data
     map.setView([latitude,longitude])
@@ -35,6 +39,7 @@ socket.on("receive-location",(data)=>{
     }
 })
 
+//when user disconnect than remove from map
 socket.on("user-disconnected",(id)=>{
     if(markers[id]){
         map.removeLayer(markers[id])
